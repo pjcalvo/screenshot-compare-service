@@ -1,0 +1,29 @@
+[run]
+source = vvs/.
+# omit = api/libs/security.py,api/run.py,api/db.py
+branch = true
+
+[report]
+fail_under = 85
+# Regexes for lines to exclude from consideration
+show_missing = true
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+
+ignore_errors = True
+
+[html]
+directory = coverage_html_report

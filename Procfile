@@ -1,0 +1,1 @@
+web: gunicorn vvs.run:app

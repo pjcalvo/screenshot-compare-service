@@ -1,0 +1,9 @@
+coverage==5.0
+dynaconf==2.2.0
+gunicorn==20.0.4
+Flask==1.1.1
+Flask-RESTful==0.3.7
+Pillow==7.0.0
+pycodestyle==2.5.0
+pytest-flask==0.15.0
+selenium==3.141.0

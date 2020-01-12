@@ -1,0 +1,16 @@
+[default]
+DEBUG = true
+port = 5002
+
+[testing]
+port = 5002
+
+[development]
+
+[staging]
+DEBUG = true
+port = 5000
+
+[production]
+DEBUG = false
+port = 5000
