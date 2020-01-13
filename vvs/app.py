@@ -3,6 +3,7 @@ import flask_restful
 
 from vvs.api.api import api
 
+
 def create_app():
 
     # load app instance

@@ -1,9 +1,41 @@
-api for UnCompa.com
+api Visual Validation Service
+
+# Information
+This service exposes several endpoints for comparing the websites rendering by taking screenshots using selenium and comparing target tests against baselines.
+
+```bash
+curl --request POST \
+  --url http://localhost:5000/api/crosssite \
+  --header 'content-type: application/json' \
+  --data '{
+	"browser":"chrome",
+	"urls":{
+		"base":"https://www.google.com",
+		"targets":[
+			"https://www.google.com",
+			"https://www.google.com?q=hola"]
+	}
+}'
+```
+
+```bash
+curl --request POST \
+  --url http://localhost:5000/api/crossbrowser \
+  --header 'content-type: application/json' \
+  --data '{
+	"url":"https://www.google.com",
+	"browsers":{
+		"base":"chrome",
+		"targets":["firefox", "chrome"]
+	}
+}'
+```
 
 # Tech Stack
     * Python3
     * Flask
-    * MySql
+    * Pillow
+    * Selenium Webdriver
 
 # Running
 ```bash
@@ -36,26 +68,11 @@ pytest --cov-config=.coveragerc --cov=api/
 **Secrets**
 Secrets are not committed but can be readed as a setting file, for DB passwords and so use the .secrets file
 
-# Continues integration and deployment 
-**Bitbucket pipelines**
-- Master branch is locked and no direct commits are allowed
-- When a new PR is created a bitbucket pipeline is executed to measure coverage, codestyle and unit tests.
-- If the build is succesful it can be merged to master.
-- After merging to master another pipeline is executed to make sure the merge was succesful.
-
 **Deployment to heroku**
 Once the master build has finished testing,  a manual triggered will be waiting to deploy to heroku.
 - This will allow us to deploy on demand and skip configuration, miscelaneus or undesired deployments to staging.
 - To deploy live go to Heroku pipelines and promote the latest build on staging
 
-# Contribution Guidelines
-Please follow the team rules:
-    * No commits to Master
-    * Meaningful descriptive Pull Requests: *[ISSUE-001] Nice PR description*
-    * Continues integration: [ISSUE-001] *This is a small nice commit*
-
 # Contributors
-    * Alejandro Sanchez
-    * Gabriel Calvo
     * Pablo Calvo
 
