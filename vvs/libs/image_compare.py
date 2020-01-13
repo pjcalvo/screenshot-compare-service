@@ -2,23 +2,32 @@ from PIL import Image, ImageDraw
 from datetime import datetime
 import os
 
-RESOLUTION = (1024, 768)
+DEFAULT_RESOLUTION = (1024, 768)
+COLUMNS = 120
+ROWS = 80
 
-def analyze(base, target, difference_dir):
+def analyze(base, target, differences_dir, resolution = DEFAULT_RESOLUTION):
+
+    print (base)
+    print (target)
+
 
     try:
-        columns = 60
-        rows = 80
         test_failed = False
 
+        # open images and resize them
         screenshot_base = Image.open(base)
-        screenshot_base.resize(RESOLUTION)
+        screenshot_base = screenshot_base.resize(resolution)
         screenshot_target = Image.open(target)
-        screenshot_target.resize(RESOLUTION)
+        screenshot_target = screenshot_target.resize(resolution)
+
+        print(screenshot_target.size)
+        print(screenshot_base.size)
+
         screen_width, screen_height = screenshot_target.size
 
-        block_width = ((screen_width - 1) // columns) + 1 # this is just a division ceiling
-        block_height = ((screen_height - 1) // rows) + 1
+        block_width = ((screen_width - 1) // COLUMNS) + 1 # this is just a division ceiling
+        block_height = ((screen_height - 1) // ROWS) + 1
 
         for y in range(0, screen_height, block_height+1):
             for x in range(0, screen_width, block_width+1):
@@ -32,20 +41,20 @@ def analyze(base, target, difference_dir):
 
         if test_failed:
             print('*** There are visual differences. Saving results to /difference.')
-            file_name = os.path.join( difference_dir , f'{datetime.now()}.png')
+            file_name = os.path.join( differences_dir , f'{datetime.now()}.png')
             screenshot_target.save(file_name)
             return file_name
         else:
             print('*** No visual differences.')
-    except Exception as ex:
+    except FileNotFoundError as ex:
         print(ex)
-        return 'Error file was not proccesed'
+        return None
 
 def process_region(image, x, y, width, height):
     region_total = 0
 
     # This can be used as the sensitivity factor, the larger it is the less sensitive the comparison
-    factor = 100
+    factor = 150
 
     for coordinateY in range(y, y+height):
         for coordinateX in range(x, x+width):
@@ -56,3 +65,8 @@ def process_region(image, x, y, width, height):
                 return
 
     return region_total/factor
+
+if __name__ == '__main__':
+    image1 = '/Users/pjcalvo/Documents/repos-pjcalvo/vvs/vvs/services/screenshots_cross/base/cross_browser_1024x768_base.png'
+    image2 = '/Users/pjcalvo/Documents/repos-pjcalvo/vvs/vvs/services/screenshots_cross/targets/cross_browser_1024x768_target_1.png'
+    analyze(image1, image2, '')
