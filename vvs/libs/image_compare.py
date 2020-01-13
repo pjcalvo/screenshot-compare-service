@@ -8,10 +8,6 @@ ROWS = 80
 
 def analyze(base, target, differences_dir, resolution = DEFAULT_RESOLUTION):
 
-    print (base)
-    print (target)
-
-
     try:
         test_failed = False
 
