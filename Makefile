@@ -8,9 +8,10 @@ GUNICRORN_APP?=${APP_FOLDER}.run:app
 
 serve-flask:
 	echo "Build and serve app using FLASK dev server"
-	FLASK_APP=${FLASK_APP} FLASK run
+	FLASK_APP=${FLASK_APP} GOOGLE_APPLICATION_CREDENTIALS=google.json FLASK run
 
 serve:
+	GOOGLE_APPLICATION_CREDENTIALS=google.json
 	echo "Build and serve app using FLASK dev server"
 	gunicorn ${GUNICRORN_APP}
 	

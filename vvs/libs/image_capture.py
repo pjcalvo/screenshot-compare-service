@@ -30,7 +30,7 @@ def capture_screens(
     print(f"** Finish image capturing ...")
     driver.close()
 
-    return file_path
+    return file_name
 
 
 def get_driver(browser):

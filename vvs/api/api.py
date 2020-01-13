@@ -1,7 +1,9 @@
 from flask import Blueprint, request
 from vvs.libs import folders_setup, image_capture, image_compare
+from vvs.libs.storage import GoogleClient
 
 import os
+from datetime import datetime
 
 
 # need to config this
@@ -45,39 +47,39 @@ def crossbrowser():
 
     try:
         # create folders
-        screenshots_folder = folders_setup.create_folders(SCREENSHOTS_CROSS_DIR)
-        # capture images
+        temp_folder = folders_setup.create_temp_folder()
+        # capture image
         # capture base image
         test_results = {'base': {'browser': base, 'file': ''}, 'targets': []}
 
-        base_folder = os.path.join(screenshots_folder, BASE_DIR)
         base_file = image_capture.capture_screens(
             url=url,
             browser=base,
             file_identificator='base',
-            directory_path=base_folder,
+            directory_path=temp_folder,
             test_name=SCREENSHOTS_CROSS_TEST_NAME,
             resolution=DEFAULT_RESOLUTION)
         test_results['base']['file'] = base_file
 
         # capture target images
-        target_folder = os.path.join(screenshots_folder, TARGETS_DIR)
         for target_browser in targets:
-            target_file = image_capture.capture_screens(
+            result = image_capture.capture_screens(
                 url=url,
                 browser=target_browser,
                 file_identificator=target_browser,
-                directory_path=target_folder,
+                directory_path=temp_folder,
                 test_name=SCREENSHOTS_CROSS_TEST_NAME,
                 resolution=DEFAULT_RESOLUTION)
-            test_results['targets'].append(
-                {'target_browser': target_browser, 'file': target_file, 'result': '', 'notes': ''})
+            if result:
+                test_results['targets'].append(
+                    {'target_browser': target_browser, 'file': result, 'result': '', 'notes': ''})
 
-        differences_folder = os.path.join(screenshots_folder, DIFFERENCES_DIR)
         for target_result in test_results['targets']:
-            difference_file = image_compare.analyze(base=test_results['base']['file'],
+            difference_file = image_compare.analyze(
+                                                    base=test_results['base']['file'],
                                                     target=target_result['file'],
-                                                    differences_dir=differences_folder,
+                                                    source_dir=temp_folder,
+                                                    differences_dir=temp_folder,
                                                     resolution=DEFAULT_RESOLUTION)
             if difference_file is None:
                 target_result['result'] = 'Success'
@@ -86,9 +88,32 @@ def crossbrowser():
                 target_result['result'] = 'Failure'
                 target_result['notes'] = 'Visual differences detected.'
                 target_result['file'] = difference_file
-        return {'message': test_results}
 
-    except Exception as ex:
+        # upload to google
+        gc = GoogleClient()
+        timestamp = str(datetime.now())
+
+        # upload base
+        result = gc.upload_file(
+            os.path.join(temp_folder, test_results['base']['file']),
+            f'{timestamp}/base/{test_results["base"]["file"]}')
+        test_results["base"]["file"] = result
+
+        # upload results
+        for target_result in test_results['targets']:
+            print(target_result['file'])
+            result = gc.upload_file(
+                os.path.join(temp_folder, target_result['file']),
+                f'{timestamp}/diff/{target_result["file"]}')
+            target_result['file'] = result
+
+        # remove temp folder
+        folders_setup.delete_temp_folder(temp_folder)
+        
+        return {'message': test_results}
+    
+
+    except NotADirectoryError as ex:
         print(ex)
         return {'message': 'Something went wrong file processing the request'}, 500
 

@@ -7,19 +7,16 @@ COLUMNS = 120
 ROWS = 80
 
 
-def analyze(base, target, differences_dir, resolution=DEFAULT_RESOLUTION):
+def analyze(base, target, source_dir, differences_dir, resolution=DEFAULT_RESOLUTION):
 
     try:
         test_failed = False
 
         # open images and resize them
-        screenshot_base = Image.open(base)
+        screenshot_base = Image.open(os.path.join(source_dir, base))
         screenshot_base = screenshot_base.resize(resolution)
-        screenshot_target = Image.open(target)
+        screenshot_target = Image.open(os.path.join(source_dir, target))
         screenshot_target = screenshot_target.resize(resolution)
-
-        print(screenshot_target.size)
-        print(screenshot_base.size)
 
         screen_width, screen_height = screenshot_target.size
 
@@ -32,16 +29,17 @@ def analyze(base, target, differences_dir, resolution=DEFAULT_RESOLUTION):
                 region_target = process_region(screenshot_target, x, y, block_width, block_height)
                 region_base = process_region(screenshot_base, x, y, block_width, block_height)
 
-                if region_base is not None and region_target is not None
-                and region_base != region_target:
+                if region_base is not None and region_target is not None \
+                        and region_base != region_target:
                     test_failed = True
                     draw = ImageDraw.Draw(screenshot_target)
                     draw.rectangle((x, y, x+block_width, y+block_height), outline="red")
 
         if test_failed:
             print('*** There are visual differences. Saving results to /difference.')
-            file_name = os.path.join(differences_dir, f'{datetime.now()}.png')
-            screenshot_target.save(file_name)
+            file_name = f'{datetime.now()}.png'
+            full_path = os.path.join(differences_dir, file_name)
+            screenshot_target.save(full_path)
             return file_name
         else:
             print('*** No visual differences.')
@@ -62,8 +60,7 @@ def process_region(image, x, y, width, height):
             try:
                 pixel = image.getpixel((coordinateX, coordinateY))
                 region_total += sum(pixel)/4
-            except Exception as ex:
-                print(ex)
+            except Exception:
                 return None
 
     return region_total/factor
