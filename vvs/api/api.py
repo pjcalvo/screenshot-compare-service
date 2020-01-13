@@ -31,13 +31,16 @@ def crossbrowser():
         }
     }
     """ 
-    # simple validation 
-    body = request.get_json()
-    url = body.get('url')
-    base = body.get('browsers').get('base')
-    targets = body.get('browsers').get('targets')
-    if not url or not base or not targets or len(targets) == 0:
-        return {'message': 'Missing required params <url, base, targets> '} , 400
+    try:
+        # simple validation 
+        body = request.get_json()
+        url = body.get('url')
+        base = body.get('browsers').get('base')
+        targets = body.get('browsers').get('targets')
+        if not url or not base or not targets or len(targets) == 0:
+            return {'message': 'Missing required params <url, base, targets> '} , 400
+    except:
+        return {'message': 'Missing required params <browser, base, targets> '} , 400
 
     try:
         # create folders
