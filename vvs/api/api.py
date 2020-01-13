@@ -87,7 +87,7 @@ def crossbrowser():
 
 
 @api.route('/crosssite', methods=['POST'])
-def crossbrowser():
+def crosssite():
     """
     Expected json style:
     {
@@ -98,15 +98,18 @@ def crossbrowser():
         }
     }
     """ 
-    # simple validation by
-    body = request.get_json()
-    browser = body.get('browser')
-    base = body.get('urls').get('base')
-    targets = body.get('urls').get('targets')
-    if not browser or not base or not targets or len(targets) == 0:
+    try:
+        # simple validation by
+        body = request.get_json()
+        browser = body.get('browser')
+        base = body.get('urls').get('base')
+        targets = body.get('urls').get('targets')
+        if not browser or not base or not targets or len(targets) == 0:
+            return {'message': 'Missing required params <browser, base, targets> '} , 400
+    except:
         return {'message': 'Missing required params <browser, base, targets> '} , 400
 
-     try:
+    try:
         # create folders
         screenshots_folder = folders_setup.create_folders(SCREENSHOTS_SITE_DIR)
         # capture images
@@ -124,13 +127,15 @@ def crossbrowser():
 
         # capture target images
         target_folder = os.path.join(screenshots_folder, TARGETS_DIR)
+        count = 0
         for target_url in targets:
             target_file = image_capture.capture_screens(url=target_url, 
                                                     browser=browser, 
-                                                    file_identificator = target_browser, 
+                                                    file_identificator = f'{count}', 
                                                     directory_path = target_folder, 
                                                     test_name = SCREENSHOTS_SITE_TEST_NAME,
                                                     resolution = DEFAULT_RESOLUTION)
+            count += 1
             test_results['targets'].append({'target_url': target_url, 'file':target_file, 'result':'', 'notes':''})
 
         differences_folder = os.path.join(screenshots_folder, DIFFERENCES_DIR)
