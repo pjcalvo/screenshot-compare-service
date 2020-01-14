@@ -8,7 +8,7 @@ GUNICRORN_APP?=${APP_FOLDER}.run:app
 
 serve-flask:
 	echo "Build and serve app using FLASK dev server"
-	FLASK_APP=${FLASK_APP} GOOGLE_APPLICATION_CREDENTIALS=google.json FLASK run
+	CHROMEDRIVER_PATH="./drivers/chromedriver" FLASK_APP=${FLASK_APP} FLASK run
 
 serve:
 	GOOGLE_APPLICATION_CREDENTIALS=google.json

@@ -13,7 +13,7 @@ class GoogleClient():
     def __init__(self):
         self.storage_client = storage.Client()
 
-    def create_buckets(self):
+    def create_buckets(self, bucket_name):
         try:
             bucket = self.storage_client.get_bucket(bucket_name)
             print(f'Bucket { bucket.name } already exist. Ignoning creation')
@@ -37,4 +37,4 @@ class GoogleClient():
 
 if __name__ == "__main__":
     i = GoogleClient()
-    i.create_bucket('vvs-test-buckets')
+    i.create_buckets('vvs-test-buckets')
