@@ -20,6 +20,7 @@ SCREENSHOTS_SITE_DIR = 'screenshots_site'
 
 api = Blueprint('api', 'api', url_prefix='/api')
 
+
 @api.route('/crossbrowser', methods=['POST'])
 def crossbrowser():
     """

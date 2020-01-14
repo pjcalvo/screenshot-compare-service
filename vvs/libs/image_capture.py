@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 import os
 
+CHROME_LOCATION = './drivers/chromedriver'
 FIREFOX_LOCATION = './drivers/geckodriver'
 
 DEFAULT_RESOULUTION = (1024, 768)
@@ -34,13 +35,9 @@ def capture_screens(
 
 def get_driver(browser):
     if browser == 'chrome':
-        chrome_options = webdriver.ChromeOptions()
-        if os.environ.get("GOOGLE_CHROME_BIN"):
-            chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options = ChromeOptions()
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--no-sandbox")
-        return webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+        return webdriver.Chrome(CHROME_LOCATION,  chrome_options=chrome_options)
     elif browser == 'firefox':
         firefox_options = FirefoxOptions()
         firefox_options.headless = True
