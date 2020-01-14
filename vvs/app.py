@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import flask_restful
 
 from vvs.api.api import api
@@ -11,8 +11,9 @@ def create_app():
     app.register_blueprint(api)
 
     @app.route("/")
+    @app.route('/')
     def index():
-        return 'Hello there! Welcome to visual validation service!'
+        return render_template('index.html', title='Home')
 
     @app.route("/status")
     def status():
