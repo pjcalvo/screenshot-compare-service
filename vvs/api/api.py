@@ -46,7 +46,7 @@ def crossbrowser():
         return {'message': 'Missing required params <browser, base, targets> '}, 400
 
     try:
-        # create folders
+        # create a temporary folder
         temp_folder = folders_setup.create_temp_folder()
         # capture image
         # capture base image
@@ -143,42 +143,39 @@ def crosssite():
         return {'message': 'Missing required params <browser, base, targets> '}, 400
 
     try:
-        # create folders
-        screenshots_folder = folders_setup.create_folders(SCREENSHOTS_SITE_DIR)
+        temp_folder = folders_setup.create_temp_folder()
         # capture images
         # capture base image
         test_results = {'base': {'url': base, 'file': ''}, 'targets': []}
 
-        base_folder = os.path.join(screenshots_folder, BASE_DIR)
         base_file = image_capture.capture_screens(
             url=base,
             browser=browser,
             file_identificator='base',
-            directory_path=base_folder,
+            directory_path=temp_folder,
             test_name=SCREENSHOTS_SITE_TEST_NAME,
             resolution=DEFAULT_RESOLUTION)
         test_results['base']['file'] = base_file
 
         # capture target images
-        target_folder = os.path.join(screenshots_folder, TARGETS_DIR)
         count = 0
         for target_url in targets:
             target_file = image_capture.capture_screens(
                 url=target_url,
                 browser=browser,
                 file_identificator=f'{count}',
-                directory_path=target_folder,
+                directory_path=temp_folder,
                 test_name=SCREENSHOTS_SITE_TEST_NAME,
                 resolution=DEFAULT_RESOLUTION)
             count += 1
             test_results['targets'].append(
                 {'target_url': target_url, 'file': target_file, 'result': '', 'notes': ''})
 
-        differences_folder = os.path.join(screenshots_folder, DIFFERENCES_DIR)
         for target_result in test_results['targets']:
             difference_file = image_compare.analyze(base=test_results['base']['file'],
                                                     target=target_result['file'],
-                                                    differences_dir=differences_folder,
+                                                    differences_dir=temp_folder,
+                                                    source_dir=temp_folder,
                                                     resolution=DEFAULT_RESOLUTION)
             if difference_file is None:
                 target_result['result'] = 'Success'
@@ -187,6 +184,28 @@ def crosssite():
                 target_result['result'] = 'Failure'
                 target_result['notes'] = 'Visual differences detected.'
                 target_result['file'] = difference_file
+        
+        # upload to google
+        gc = GoogleClient()
+        timestamp = str(datetime.now())
+
+        # upload base
+        result = gc.upload_file(
+            os.path.join(temp_folder, test_results['base']['file']),
+            f'{timestamp}/base/{test_results["base"]["file"]}')
+        test_results["base"]["file"] = result
+
+        # upload results
+        for target_result in test_results['targets']:
+            print(target_result['file'])
+            result = gc.upload_file(
+                os.path.join(temp_folder, target_result['file']),
+                f'{timestamp}/diff/{target_result["file"]}')
+            target_result['file'] = result
+
+        # remove temp folder
+        folders_setup.delete_temp_folder(temp_folder)
+
         return {'message': test_results}
 
     except Exception as ex:
