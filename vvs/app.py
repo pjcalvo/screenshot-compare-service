@@ -1,6 +1,5 @@
 from flask import Flask, render_template
-import flask_restful
-
+from flask_cors import CORS
 from vvs.api.api import api
 
 
@@ -9,9 +8,10 @@ def create_app():
     # load app instance
     app = Flask(__name__)
     app.register_blueprint(api)
+    CORS(app)
 
     @app.route("/")
-    @app.route('/')
+    @app.route('/index')
     def index():
         return render_template('index.html', title='Home')
 

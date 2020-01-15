@@ -18,7 +18,7 @@ curl --request POST \
 }'
 ```
 
-```bash
+```bash 
 curl --request POST \
   --url http://localhost:5000/api/crossbrowser \
   --header 'content-type: application/json' \

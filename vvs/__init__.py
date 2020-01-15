@@ -7,6 +7,9 @@ app_settings = {
 }
 
 # create google credentials variable
-credentials = json.loads(os.environ['GOOGLE_CREDENTIALS'])
-with open("credentials.json", 'w') as f:
-    json.dump(credentials, f)
+try:
+    credentials = json.loads(os.environ['GOOGLE_CREDENTIALS'])
+    with open("credentials.json", 'w') as f:
+        json.dump(credentials, f)   
+except KeyError as ex:
+    print('GOOGLE_CREDENTIALS not found on ENV. Images will not be update') 
