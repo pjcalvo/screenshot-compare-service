@@ -25,7 +25,14 @@ def capture_screens(
     driver.set_window_size(x, y)  # set desired resolution
     driver.get(url)  # navigate to test URL
 
-    driver.save_screenshot(file_path)
+    # close screenshot
+    try: 
+        driver.find_element_by_css_selector('.new-alert-x-close').click()
+    except:
+        print(f"** Problem clicking the x ...")
+
+    el = driver.find_element_by_tag_name('body')
+    el.screenshot(file_path)
     print(f"** Finish image capturing ...")
     driver.close()
 
