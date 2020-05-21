@@ -31,8 +31,10 @@ def capture_screens(
     except:
         print(f"** Problem clicking the x ...")
 
-    el = driver.find_element_by_tag_name('body')
-    el.screenshot(file_path)
+    S = lambda X: driver.execute_script('return document.body.parentNode.scroll'+X)
+    driver.set_window_size(S('Width'),S('Height'))
+    driver.find_element_by_tag_name('body').screenshot(file_path)
+
     print(f"** Finish image capturing ...")
     driver.close()
 
