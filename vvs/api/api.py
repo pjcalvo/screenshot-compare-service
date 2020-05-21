@@ -73,6 +73,8 @@ def crossbrowser():
                 test_results['targets'].append(
                     {'target_browser': target_browser, 'file': result, 'result': '', 'notes': ''})
 
+        print("*** Starting image validation")
+
         for target_result in test_results['targets']:
             difference_file = image_compare.analyze(
                                                     base=test_results['base']['file'],
@@ -88,6 +90,7 @@ def crossbrowser():
                 target_result['notes'] = 'Visual differences detected.'
                 target_result['file'] = difference_file
 
+        print("*** Starting image upload")
         # upload to google
         gc = GoogleClient()
         timestamp = str(datetime.now())

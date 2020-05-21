@@ -14,9 +14,9 @@ def analyze(base, target, source_dir, differences_dir, resolution=DEFAULT_RESOLU
 
         # open images and resize them
         screenshot_base = Image.open(os.path.join(source_dir, base))
-        screenshot_base = screenshot_base.resize(resolution)
+        # screenshot_base = screenshot_base.resize(resolution)
         screenshot_target = Image.open(os.path.join(source_dir, target))
-        screenshot_target = screenshot_target.resize(resolution)
+        # screenshot_target = screenshot_target.resize(resolution)
 
         screen_width, screen_height = screenshot_target.size
 
